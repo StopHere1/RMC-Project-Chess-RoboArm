@@ -10,7 +10,12 @@ from pypose.driver import Driver
 
 SERVO_1 = 1
 SERVO_2 = 2
-SERVOS = [SERVO_2, SERVO_1]
+SERVO_3 = 3
+SERVO_4 = 4
+SERVO_5 = 5
+SERVO_6 = 6
+
+SERVOS = [SERVO_6, SERVO_5, SERVO_4, SERVO_3, SERVO_2, SERVO_1]
 MIN_SPEED = 20
 MAX_SPEED = 80
 RESTING_POSITION = (512, 512)
@@ -55,9 +60,11 @@ class Arm(object):
     def move(self, goal_position):
         start_position = self.current_position()
         self.set_speed([MIN_SPEED, MIN_SPEED])  # input 2 MIN_SPEED here ?
-        for i in SERVOS:
+        # 根据坐标旋转底部电机对准角度
+        # 保持执行器末端z轴不变运动到棋子上方
+        for i in SERVOS:  # 遍历电机运动，这里需要打包两对电机？
             self.driver.setReg(i, P_GOAL_POSITION_L, [goal_position[i % 2] % 256, goal_position[i % 2] >> 8])
-        while self._is_moving():
+        while self._is_moving():  # 控制运动速度变化
             position = self.current_position()
             speed = [_adjusted_speed(start_position[i % 2], goal_position[i % 2], position[i % 2]) for i in SERVOS]
             self.set_speed(speed)
