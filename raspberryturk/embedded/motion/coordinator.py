@@ -6,13 +6,13 @@ from raspberryturk.embedded.motion.gripper import Gripper
 from raspberryturk.embedded.motion.arm import Arm
 
 
-def _castling(move, board):
+def _castling(move, board):  # 王车易位
     return move.from_square in [chess.E1, chess.E8] \
            and move.to_square in [chess.C1, chess.G1, chess.C8, chess.G8] \
-           and board.piece_at(move.from_square).piece_type == chess.KING
+           and board.piece_at(move.from_square).piece_type == chess.KING      # 三个并列条件
 
 
-def _sq_to_pt(sq):
+def _sq_to_pt(sq):  # converting square to point for arm
     i = 63 - sq
     return np.array([i % 8, i / 8]) * 2.25 + 1.125
 
@@ -24,13 +24,13 @@ class Coordinator(object):
         self._logger = logging.getLogger(__name__)
 
     def move_piece(self, move, board):  # 应该是最上层的move方法
-        if _castling(move, board):  # 满足移动的条件
-            a_side = chess.square_file(move.to_square) < chess.square_file(move.from_square)
+        if _castling(move, board):  # 满足王车易位的条件
+            a_side = chess.square_file(move.to_square) < chess.square_file(move.from_square) # 确认易位方向
             from_file_index = 0 if a_side else 7
             to_file_index = 3 if a_side else 5
-            rank_index = 0 if board.turn is chess.WHITE else 7
+            rank_index = 0 if board.turn is chess.WHITE else 7  # chess color
             rook_from_sq = chess.square(from_file_index, rank_index)
-            rook_to_sq = chess.square(to_file_index, rank_index)
+            rook_to_sq = chess.square(to_file_index, rank_index)   # 车的移动
             self._execute_move(_sq_to_pt(rook_from_sq),
                                _sq_to_pt(rook_to_sq),
                                chess.ROOK)
@@ -38,24 +38,27 @@ class Coordinator(object):
             captured_piece = board.piece_at(move.to_square)
             if captured_piece is not None:
                 self._execute_move(_sq_to_pt(move.to_square), [20, 13.5],
-                                   captured_piece.piece_type)
+                                   captured_piece.piece_type)  # 看起来是吃棋子的过程，先把前面的棋子拿走再移动
         piece = board.piece_at(move.from_square)
-        self._execute_move(_sq_to_pt(move.from_square),
+        self._execute_move(_sq_to_pt(move.from_square),    # 棋子移动
                            _sq_to_pt(move.to_square),
                            piece.piece_type)
 
     def _execute_move(self, origin, destination, piece_type):
         self._logger.info("Moving piece {} at {} to {}...".format(piece_type, origin, destination))
+        # writing adjustment message
         t0 = time.time()
-        self.arm.move_to_point(origin)
+        self.arm.move_to_point(origin)  # move to pickup point
         self.gripper.pickup(piece_type)
-        self.arm.move_to_point(destination)
+        self.arm.move_to_point(destination)  # move to destination
         self.gripper.dropoff(piece_type)
         self.arm.return_to_rest()
-        elapsed_time = time.time() - t0
+        elapsed_time = time.time() - t0  # time count
         self._logger.info("Done moving piece (elapsed time: {}s).".format(elapsed_time))
+        # writing move done message
 
     def reset(self):
+        #  reset
         self.gripper.calibrate()
         self.arm.return_to_rest()
 

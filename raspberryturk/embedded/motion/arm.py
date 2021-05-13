@@ -49,12 +49,12 @@ class Arm(object):
     def recenter(self):
         self.move((512, 512))
 
-    def return_to_rest(self):
+    def return_to_rest(self):  # position where dead pieces rest ?
         self.move_to_point([20, 13.5])
 
     def move(self, goal_position):
         start_position = self.current_position()
-        self.set_speed([MIN_SPEED, MIN_SPEED])
+        self.set_speed([MIN_SPEED, MIN_SPEED])  # input 2 MIN_SPEED here ?
         for i in SERVOS:
             self.driver.setReg(i, P_GOAL_POSITION_L, [goal_position[i % 2] % 256, goal_position[i % 2] >> 8])
         while self._is_moving():
