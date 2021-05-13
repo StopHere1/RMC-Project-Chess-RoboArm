@@ -60,6 +60,7 @@ def _create_labels(encoding_function, symbols, one_hot):
         index_offset = np.arange(num_labels) * num_classes
         labels_one_hot = np.zeros((num_labels, num_classes), dtype=np.uint8)
         labels_one_hot.flat[index_offset + labels.ravel().astype(np.uint8)] = 1
+        labels = labels_one_hot
     return labels
 
 
