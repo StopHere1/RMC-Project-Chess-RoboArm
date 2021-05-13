@@ -18,3 +18,23 @@ class Dataset(object):
                         y_val=self.y_val,
                         zca=self.zca,
                         metadata=self.metadata)
+
+    @classmethod
+    def load_file(cls, filename):
+        with open(filename, 'rb') as f:
+            data = np.load(f)
+            X_train = data['X_train']
+            X_val = data['X_val']
+            y_train = data['y_train']
+            y_val = data['y_val']
+            zca = None
+            try:
+                zca = data['zca']
+            except KeyError:
+                pass
+            metadata = None
+            try:
+                metadata = data['metadata']
+            except KeyError:
+                pass
+            return cls(X_train, X_val, y_train, y_val, zca=zca, metadata=metadata)
