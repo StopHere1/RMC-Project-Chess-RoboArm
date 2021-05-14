@@ -20,7 +20,7 @@ MIN_SPEED = 20
 MAX_SPEED = 80
 RESTING_POSITION = (512, 512)
 
-
+##输入一个list，返回list的第一位，和第二位二进制向左移8个0后对应的10进制的数
 def _register_bytes_to_value(register_bytes):
     return register_bytes[0] + (register_bytes[1] << 8)
 
