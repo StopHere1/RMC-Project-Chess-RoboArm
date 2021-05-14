@@ -7,6 +7,9 @@ from random import randint
 from notebooks.helpers import plot_confusion_matrix
 from sklearn.metrics import confusion_matrix
 tf.compat.v1.disable_eager_execution()
+# because the version of tf for python3.8 causes the change of function
+# add ".compat.v1" between tf and function to make sure it goes right
+# you may like to delet it if you meet some mistake.
 
 
 MAX_DISPLAY_STEP = 1000
@@ -58,9 +61,6 @@ def max_pool_2x2(x1):
 
 x = tf.compat.v1.placeholder('float', shape=[None, image_size])
 y_ = tf.compat.v1.placeholder('float', shape=[None, labels_count])
-# -------------------------------
-# x = tf.placeholder('float', shape=[None, image_size])
-# y_ = tf.placeholder('float', shape=[None, labels_count])
 
 W_conv1 = weight_variable([5, 5, 1, 32])
 b_conv1 = bias_variable([32])
@@ -151,9 +151,6 @@ for i in range(TRAINING_ITERATIONS):
         ind = randint(0, validation_images.shape[0] - val_len - 1)
         val_images_batch = validation_images[ind:ind + val_len]
         val_labels_batch = validation_labels[ind:ind + val_len]
-        # print(val_images_batch)
-        # print("dhasi:")
-        # print(val_labels_batch)
         validation_accuracy = accuracy.eval(feed_dict={x: val_images_batch,
                                                        y_: val_labels_batch,
                                                        keep_prob: 1.0})
@@ -168,20 +165,13 @@ for i in range(TRAINING_ITERATIONS):
             display_step = min(MAX_DISPLAY_STEP, display_step * 10)
 
     sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys, keep_prob: DROPOUT})
-    # print(sess)
 print("Finished training, best batch validation model accuracy: %.5f" % (previous_best))
-# print(predict)
 feed_deictt = {x: validation_images, keep_prob: 1.0}
-# print({keep_prob: 1.0})
-# print(validation_images)
-# print(list(feed_deictt.keys()))
 pred = sess.run(predict, feed_dict={x: validation_images, keep_prob: 1.0})
-# print("real")
 full_validation_accuracy = accuracy.eval(feed_dict={x: validation_images,
                                                     y_: validation_labels,
                                                     keep_prob: 1.0})
 print("Validation accuracy: %.5f" % full_validation_accuracy)
-# print(validation_labels.argmax(axis=1))
 conf = confusion_matrix(validation_labels.argmax(axis=1), pred)
 
 plot_confusion_matrix(conf, labels)
