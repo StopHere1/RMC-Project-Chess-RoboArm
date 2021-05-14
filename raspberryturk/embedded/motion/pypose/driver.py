@@ -17,10 +17,13 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software Foundation,
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
 """
 
 # This is an adapted version of the driver.py file found in
 # the pypose project (https://github.com/vanadiumlabs/pypose).
+# serial 是外界接口相关的函数
+# time 待查
 
 import serial
 import time
@@ -35,13 +38,13 @@ class Driver:
     def __init__(self, port="/dev/ttyUSB0", baud=38400, interpolation=False, direct=False, verbose=False):
         """ This may throw errors up the line -- that's a good thing. """
         self.ser = serial.Serial()
-        self.ser.baudrate = baud
-        self.ser.port = port
-        self.ser.timeout = 0.5
-        self.ser.open()
-        self.error = 0
-        self.hasInterpolation = interpolation
-        self.direct = direct
+        self.ser.baudrate = baud #波特率
+        self.ser.port = port  #读或写端口
+        self.ser.timeout = 0.5  #读超时设置
+        self.ser.open()  #打开端口
+        self.error = 0    
+        self.hasInterpolation = interpolation  #查不到
+        self.direct = direct  #没查到
         self.logger = logging.getLogger(__name__)
         time.sleep(3)
 
