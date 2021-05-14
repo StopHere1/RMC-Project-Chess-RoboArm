@@ -74,8 +74,8 @@ class Driver:
             return None
 
         # now process our byte
-        if mode == 0:  # get our first 0xFF
-            if ord(d) == 0xff:
+        if mode == 0:  # get our first 0xFF：0x代表16进制数,0xff表示的数二进制1111 1111 占一个字节.和其进行&操作的数,最低8位,不会发生变化.
+            if ord(d) == 0xff:    #ord ASII码
                 self.logger.debug("Oxff found")
                 return self.getPacket(1)
             else:
@@ -126,7 +126,7 @@ class Driver:
     def getReg(self, index, regstart, rlength):
         """ Get the value of registers, should be called as such:
         ax12.getReg(1,1,1) """
-        vals = self.execute(index, AX_READ_DATA, [regstart, rlength])
+        vals = self.execute(index, AX_READ_DATA, [regstart, rlength])   #vals=getPacket(0),也就是一直迭代？
         if vals is None:
             self.logger.debug("Read Failed: Servo ID = " + str(index))
             return -1
