@@ -50,10 +50,10 @@ class Driver:
 
     def execute(self, index, ins, params):
         """ Send an instruction to a device. """
-        self.ser.flushInput()
+        self.ser.flushInput() #丢弃接收缓存中的所有数据。
         length = 2 + len(params)
         checksum = 255 - ((index + length + ins + sum(params)) % 256)
-        self.ser.write(chr(0xFF) + chr(0xFF) + chr(index) + chr(length) + chr(ins))
+        self.ser.write(chr(0xFF) + chr(0xFF) + chr(index) + chr(length) + chr(ins))    #向端口写数据。
         for val in params:
             self.ser.write(chr(val))
         self.ser.write(chr(checksum))
@@ -68,7 +68,7 @@ class Driver:
     def getPacket(self, mode, id=-1, leng=-1, error=-1, params=None):
         """ Read a return packet, iterative attempt """
         # need a positive byte
-        d = self.ser.read()
+        d = self.ser.read()  #从端口读字节数据。默认1个字节。
         if d == '':
             self.logger.debug("Fail Read")
             return None
