@@ -5,17 +5,17 @@ import chess
 electromagnet_pin = 40
 servo_pin = 38
 
-PIECE_HEIGHTS = {
-    chess.KING: 41,
-    chess.QUEEN: 34,
-    chess.ROOK: 20,
-    chess.BISHOP: 28,
-    chess.KNIGHT: 24,
-    chess.PAWN: 19
+PIECE_HEIGHTS = {  # changed according to the chess height (mm)
+    chess.KING: 66,
+    chess.QUEEN: 56,
+    chess.ROOK: 37,
+    chess.BISHOP: 48,
+    chess.KNIGHT: 43,
+    chess.PAWN: 30,
 }
 
 MAX_PIECE_HEIGHT = max(PIECE_HEIGHTS.values())
-RESTING_HEIGHT = MAX_PIECE_HEIGHT + 15
+RESTING_HEIGHT = MAX_PIECE_HEIGHT + 15   # set rest size considering the length of metal rod ?
 
 
 class Gripper(object):
@@ -25,10 +25,10 @@ class Gripper(object):
         GPIO.setup(servo_pin, GPIO.OUT)
         GPIO.setup(electromagnet_pin, GPIO.OUT)
 
-    def calibrate(self):
+    def calibrate(self):    # reset to the rest height
         self.move(RESTING_HEIGHT)
 
-    def move(self, z):
+    def move(self, z):  # Gripper move along Z axis，We do not have this DOF
         z = max(0.0, min(z, 100.0))
         dc = (z * 0.067) + 4.0
         p = GPIO.PWM(servo_pin, 50.0)
@@ -42,7 +42,7 @@ class Gripper(object):
         del p
         self.previous_z = z
 
-    def electromagnet(self, on):
+    def electromagnet(self, on):    # Electromagnet state switching
         output = GPIO.HIGH if on else GPIO.LOW
         GPIO.output(electromagnet_pin, output)
 
