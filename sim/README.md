@@ -79,18 +79,31 @@ traj = [pick; move; place];
 要解决的有两种运动，一种是向上平动的pick和向下平动的place;另一种是在move操作的第二阶段的stretch或withdraw的操作
 
 <div align = "center">
-<img src = two_link.svg width = 60%/>
+<img src = repo/two_link.svg width = 60%/>
 </div>
 
 ### 正运动学方程
-$$ x_end=l_1cos(\theta_1)+l_2cos(theta_1+\theta_2) $$
-$$ y_end=l_1sin(\theta_1)+l_2sin(theta_1+\theta_2) $$
+$$ x_{end}=l_1cos(\theta_1)+l_2cos(\theta_1+\theta_2) $$
+$$ y_{end}=l_1sin(\theta_1)+l_2sin(\theta_1+\theta_2) $$
 
 ### 逆运动学求解
 
+<div align = "center">
+<img src = repo/pic2.svg width = 60%/>
+</div>
+
+$$ cos(\theta_2)=\frac{x_{end}^2+y_{end}^2-l_1^2+l_2^2}{2l_1l_2} $$
+\
+NOTED: we need an upper elbow solution, therefore:
+$$ \theta_2=atan2(-\sqrt{1-cos^2(\theta_2)},cos(\theta_2)) $$
+$$ \theta_1= atan2(y_{end},x_{end})-atan2(l_2sin(\theta_2),l_1+l_2cos(\theta_2)) $$
+\
+For the electromagnet in the end:
+$$ \theta_3=\pi-(2\pi-\theta_1-\pi+\theta_2-\pi/2)=\theta_1-\theta_2+\pi/2 $$
+
 
 ### 速度雅可比矩阵
-
+还没求
 
 ### 正向动力学方程
 缺实际物理参数
