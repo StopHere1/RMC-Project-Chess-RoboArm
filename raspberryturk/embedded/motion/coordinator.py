@@ -14,7 +14,7 @@ def _castling(move, board):  # 王车易位
 
 def _sq_to_pt(sq):  # converting square to point for arm
     i = 63 - sq
-    return np.array([i % 8, i / 8]) * 2.25 + 1.125
+    return np.array([i % 8, i / 8]) * 3.55 + 1.775  # changed according to board size.  (plane parallel to z=0 )
 
 
 class Coordinator(object):
@@ -37,7 +37,7 @@ class Coordinator(object):
         else:
             captured_piece = board.piece_at(move.to_square)
             if captured_piece is not None:
-                self._execute_move(_sq_to_pt(move.to_square), [20, 13.5],
+                self._execute_move(_sq_to_pt(move.to_square), [20, 13.5],   # 这个数据应该需要修改
                                    captured_piece.piece_type)  # 看起来是吃棋子的过程，先把前面的棋子拿走再移动
         piece = board.piece_at(move.from_square)
         self._execute_move(_sq_to_pt(move.from_square),    # 棋子移动

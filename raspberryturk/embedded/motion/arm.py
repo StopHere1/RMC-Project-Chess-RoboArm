@@ -15,12 +15,12 @@ SERVO_4 = 2
 SERVO_5 = 17  # combined with SERVO_4
 SERVO_6 = 11
 # 这里可以打包两组电机
-SERVOS = [SERVO_6, SERVO_5, SERVO_4, SERVO_3, SERVO_2, SERVO_1]
+SERVOS = [SERVO_6, SERVO_4, SERVO_2, SERVO_1]
 MIN_SPEED = 20
 MAX_SPEED = 80
 RESTING_POSITION = (512, 512)
 
-##输入一个list，返回list的第一位，和第二位二进制向左移8个0后对应的10进制的数
+# 输入一个list，返回list的第一位，和第二位二进制向左移8个0后对应的10进制的数
 def _register_bytes_to_value(register_bytes):
     return register_bytes[0] + (register_bytes[1] << 8)
 
@@ -61,12 +61,27 @@ class Arm(object):
         start_position = self.current_position()
         self.set_speed([MIN_SPEED, MIN_SPEED])  # input 2 MIN_SPEED here ?
         # 根据坐标旋转底部电机对准角度
-
         # self.driver.setReg(1,P)
-        # 保持执行器末端z轴不变运动到棋子上方
 
+        # self.driver.setReg(2,P)
+        # self.driver.setReg(3,P)
+
+        # self.driver.setReg(4,P)
+        # self.driver.setReg(5,P)
+
+        # self.driver.setReg(6,P)
+        # 保持执行器末端z轴不变运动到棋子上方
         for i in SERVOS:  # 遍历电机运动，这里需要打包两对电机？
-            self.driver.setReg(i, P_GOAL_POSITION_L, [goal_position[i % 2] % 256, goal_position[i % 2] >> 8])
+            if i == SERVO_2:
+                self.driver.setReg(i, P_GOAL_POSITION_L, [goal_position[i % 2] % 256, goal_position[i % 2] >> 8])
+                self.driver.setReg(SERVO_3, P_GOAL_POSITION_L, [goal_position[i % 2] % 256, goal_position[i % 2] >> 8])
+                # 需要反向
+            elif i == SERVO_4:
+                self.driver.setReg(i, P_GOAL_POSITION_L, [goal_position[i % 2] % 256, goal_position[i % 2] >> 8])
+                self.driver.setReg(SERVO_5, P_GOAL_POSITION_L, [goal_position[i % 2] % 256, goal_position[i % 2] >> 8])
+                # 需要反向
+            else:
+                self.driver.setReg(i, P_GOAL_POSITION_L, [goal_position[i % 2] % 256, goal_position[i % 2] >> 8])
         while self._is_moving():  # 控制运动速度变化
             position = self.current_position()
             speed = [_adjusted_speed(start_position[i % 2], goal_position[i % 2], position[i % 2]) for i in SERVOS]
