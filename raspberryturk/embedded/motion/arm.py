@@ -8,12 +8,12 @@ from raspberryturk.embedded.motion.arm_movement_engine import ArmMovementEngine
 from pypose.ax12 import *
 from pypose.driver import Driver
 
-SERVO_1 = 1
-SERVO_2 = 2
-SERVO_3 = 3
-SERVO_4 = 4
-SERVO_5 = 5
-SERVO_6 = 6
+SERVO_1 = 16
+SERVO_2 = 10
+SERVO_3 = 15  # combined with SERVO_2
+SERVO_4 = 2
+SERVO_5 = 17  # combined with SERVO_4
+SERVO_6 = 11
 # 这里可以打包两组电机
 SERVOS = [SERVO_6, SERVO_5, SERVO_4, SERVO_3, SERVO_2, SERVO_1]
 MIN_SPEED = 20
@@ -61,7 +61,10 @@ class Arm(object):
         start_position = self.current_position()
         self.set_speed([MIN_SPEED, MIN_SPEED])  # input 2 MIN_SPEED here ?
         # 根据坐标旋转底部电机对准角度
+
+        # self.driver.setReg(1,P)
         # 保持执行器末端z轴不变运动到棋子上方
+
         for i in SERVOS:  # 遍历电机运动，这里需要打包两对电机？
             self.driver.setReg(i, P_GOAL_POSITION_L, [goal_position[i % 2] % 256, goal_position[i % 2] >> 8])
         while self._is_moving():  # 控制运动速度变化
