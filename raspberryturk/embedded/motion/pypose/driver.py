@@ -17,10 +17,13 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software Foundation,
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
 """
 
 # This is an adapted version of the driver.py file found in
 # the pypose project (https://github.com/vanadiumlabs/pypose).
+# serial 是外界接口相关的函数
+# time 待查
 
 import serial
 import time
@@ -35,22 +38,22 @@ class Driver:
     def __init__(self, port="/dev/ttyUSB0", baud=38400, interpolation=False, direct=False, verbose=False):
         """ This may throw errors up the line -- that's a good thing. """
         self.ser = serial.Serial()
-        self.ser.baudrate = baud
-        self.ser.port = port
-        self.ser.timeout = 0.5
-        self.ser.open()
-        self.error = 0
-        self.hasInterpolation = interpolation
-        self.direct = direct
+        self.ser.baudrate = baud #波特率
+        self.ser.port = port  #读或写端口
+        self.ser.timeout = 0.5  #读超时设置
+        self.ser.open()  #打开端口
+        self.error = 0    
+        self.hasInterpolation = interpolation  #查不到
+        self.direct = direct  #没查到
         self.logger = logging.getLogger(__name__)
         time.sleep(3)
 
     def execute(self, index, ins, params):
         """ Send an instruction to a device. """
-        self.ser.flushInput()
+        self.ser.flushInput() #丢弃接收缓存中的所有数据。
         length = 2 + len(params)
         checksum = 255 - ((index + length + ins + sum(params)) % 256)
-        self.ser.write(chr(0xFF) + chr(0xFF) + chr(index) + chr(length) + chr(ins))
+        self.ser.write(chr(0xFF) + chr(0xFF) + chr(index) + chr(length) + chr(ins))    #向端口写数据。
         for val in params:
             self.ser.write(chr(val))
         self.ser.write(chr(checksum))
@@ -65,14 +68,14 @@ class Driver:
     def getPacket(self, mode, id=-1, leng=-1, error=-1, params=None):
         """ Read a return packet, iterative attempt """
         # need a positive byte
-        d = self.ser.read()
+        d = self.ser.read()  #从端口读字节数据。默认1个字节。
         if d == '':
             self.logger.debug("Fail Read")
             return None
 
         # now process our byte
-        if mode == 0:  # get our first 0xFF
-            if ord(d) == 0xff:
+        if mode == 0:  # get our first 0xFF：0x代表16进制数,0xff表示的数二进制1111 1111 占一个字节.和其进行&操作的数,最低8位,不会发生变化.
+            if ord(d) == 0xff:    #ord ASII码
                 self.logger.debug("Oxff found")
                 return self.getPacket(1)
             else:
@@ -123,7 +126,7 @@ class Driver:
     def getReg(self, index, regstart, rlength):
         """ Get the value of registers, should be called as such:
         ax12.getReg(1,1,1) """
-        vals = self.execute(index, AX_READ_DATA, [regstart, rlength])
+        vals = self.execute(index, AX_READ_DATA, [regstart, rlength])   #vals=getPacket(0),也就是一直迭代？
         if vals is None:
             self.logger.debug("Read Failed: Servo ID = " + str(index))
             return -1

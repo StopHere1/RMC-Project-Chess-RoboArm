@@ -1,6 +1,12 @@
+# added ny ourselves
+
 # .idea
 notebooks
 # data
+.tif
+.gif
+
+# generated for python
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
