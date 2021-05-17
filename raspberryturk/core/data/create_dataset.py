@@ -27,7 +27,7 @@ def _load_squares(base_path, grayscale, rotation, encoding_function, sample):
             _, sym, position, angle = components
             for fn in files:
                 _, ext = os.path.splitext(os.path.basename(fn))
-                if ext.lower().endswith(('.png', '.jpg', '.jpeg')):
+                if ext.lower().endswith(('.pic', '.jpg', '.jpeg')):
                     sq_path = os.path.join(root, fn)
                     square_files.append((sq_path, sym, position, angle))
     if sample < 1.0:
