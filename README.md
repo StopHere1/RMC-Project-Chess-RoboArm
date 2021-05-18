@@ -25,3 +25,7 @@ a project for the RMC course, creating a chess playing robot arm\
 
 **Update AX-12A control code from Xia:**
 * (wait for description)
+
+## NEW CHANGES (till: 5.18)
+**上传了电机的代码 from 夏**\
+**Ubuntu上库的依赖似乎不报错了，可以试着在树莓派上跑了 from 庞**
