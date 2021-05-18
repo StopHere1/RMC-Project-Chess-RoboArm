@@ -67,6 +67,6 @@ class Agent(object):
                 game.apply_move(m)
         else:
             m = self._player.select_move(b)
-            self._motion_coordinator.move_piece(m, b)  # 执行arm.py里的move方法
+            self._motion_coordinator.move_piece(m, b)  # 执行coordinator.py里的move_piece方法
             game.apply_move(m)
         self._write_status()
