@@ -57,6 +57,28 @@ class Arm(object):
     def return_to_rest(self):  # position where dead pieces rest ?
         self.move_to_point([20, 13.5])
 
+    def return_to_rest_new(self):  # position where dead pieces rest ?
+        self.move_new((512, 512, 512, 512))
+
+    def move_new(self, goal_position):
+        # start_position = self.current_position()
+        self.set_speed([MIN_SPEED, MIN_SPEED])
+        for i in SERVOS:  # 遍历电机运动，打包两对电机   QAQ注意舵盘反向问题，改[i % 2]这个
+            if i == SERVO_2:
+                self.driver.syncWrite(P_GOAL_POSITION_L, [[SERVO_2, goal_position[1] % 256, goal_position[1] >> 8],
+                                      [SERVO_3, goal_position[1] % 256, goal_position[1] >> 8]])
+            elif i == SERVO_4:
+                self.driver.syncWrite(P_GOAL_POSITION_L, [[SERVO_4, goal_position[2] % 256, goal_position[2] >> 8],
+                                      [SERVO_5, goal_position[2] % 256, goal_position[2] >> 8]])
+            elif i == SERVO_1:
+                self.driver.setReg(i, P_GOAL_POSITION_L, [goal_position[0] % 256, goal_position[0] >> 8])
+            elif i == SERVO_6:
+                self.driver.setReg(i, P_GOAL_POSITION_L, [goal_position[3] % 256, goal_position[3] >> 8])
+            '''while self._is_moving():  # 控制运动速度变化
+                position = self.current_position()
+                speed = [_adjusted_speed(start_position[i % 2], goal_position[i % 2], position[i % 2]) for i in SERVOS]
+                self.set_speed(speed)'''
+
     def move(self, goal_position):
         start_position = self.current_position()
         self.set_speed([MIN_SPEED, MIN_SPEED])  # input 2 MIN_SPEED here ?
@@ -71,7 +93,7 @@ class Arm(object):
 
         # self.driver.setReg(6,P)
         # 保持执行器末端z轴不变运动到棋子上方
-        for i in SERVOS:  # 遍历电机运动，这里需要打包两对电机？
+        for i in SERVOS:  # 遍历电机运动，这里需要打包两对电机？ 目前只能动俩个(组)舵机
             if i == SERVO_2:
                 self.driver.setReg(i, P_GOAL_POSITION_L, [goal_position[i % 2] % 256, goal_position[i % 2] >> 8])
                 self.driver.setReg(SERVO_3, P_GOAL_POSITION_L, [goal_position[i % 2] % 256, goal_position[i % 2] >> 8])
@@ -87,11 +109,15 @@ class Arm(object):
             speed = [_adjusted_speed(start_position[i % 2], goal_position[i % 2], position[i % 2]) for i in SERVOS]
             self.set_speed(speed)
 
-    def move_to_point(self, pt):
-        goal_position = self.movement_engine.convert_point(pt)
+    def move_to_point_new(self, pt, piece_type):   # 将（x,y）+ piece_type 转化为关节的角度
+        goal_position = self.movement_engine.convert_point_new(pt, piece_type)  # 在此改逆运动学
+        self.move_new(goal_position)
+
+    def move_to_point(self, pt):   # 在二维坐标系中，将（x,y）转化为俩个关节的角度
+        goal_position = self.movement_engine.convert_point(pt)  # 在此改逆运动学
         self.move(goal_position)
 
-    def set_speed(self, speed):
+    def set_speed(self, speed):    # 目前只能动俩个(组)舵机，但不必用到
         for i in SERVOS:
             self.driver.setReg(i, P_GOAL_SPEED_L, [speed[i % 2] % 256, speed[i % 2] >> 8])
 
@@ -103,3 +129,13 @@ class Arm(object):
 
     def _values_for_register(self, register):
         return [_register_bytes_to_value(self.driver.getReg(index, register, 2)) for index in SERVOS]
+
+
+def main():
+    arm = Arm(port='COM3')
+    arm.move(512)
+
+
+if __name__ == '__main__':
+    main()
+

@@ -12,7 +12,7 @@ def _castling(move, board):  # 王车易位
            and board.piece_at(move.from_square).piece_type == chess.KING      # 三个并列条件
 
 
-def _sq_to_pt(sq):  # converting square to point for arm
+def _sq_to_pt(sq):  # converting square to point for arm 从棋盘位置转换成（x,y）坐标
     i = 63 - sq
     return np.array([i % 8, i / 8]) * 3.55 + 1.775  # changed according to board size.  (plane parallel to z=0 )
 
@@ -44,23 +44,25 @@ class Coordinator(object):
                            _sq_to_pt(move.to_square),
                            piece.piece_type)
 
+    '''该函数传入位置坐标均为由_sq_to_pt()得来的（x,y）坐标'''
+    '''以此函数开始改，gkd！！！'''
     def _execute_move(self, origin, destination, piece_type):
         self._logger.info("Moving piece {} at {} to {}...".format(piece_type, origin, destination))
         # writing adjustment message
         t0 = time.time()
-        self.arm.move_to_point(origin)  # move to pickup point
-        self.gripper.pickup(piece_type)
-        self.arm.move_to_point(destination)  # move to destination
-        self.gripper.dropoff(piece_type)
-        self.arm.return_to_rest()
+        self.arm.move_to_point_new(origin, piece_type)  # move to pickup point
+        self.gripper.pickup_new()
+        self.arm.move_to_point_new(destination, piece_type)  # move to destination
+        self.gripper.dropoff_new()
+        self.arm.return_to_rest_new()     # QAQ 已改成角度rest
         elapsed_time = time.time() - t0  # time count
         self._logger.info("Done moving piece (elapsed time: {}s).".format(elapsed_time))
         # writing move done message
 
     def reset(self):
         #  reset
-        self.gripper.calibrate()
-        self.arm.return_to_rest()
+        # self.gripper.calibrate()
+        self.arm.return_to_rest_new()
 
     def close(self):
         self.gripper.cleanup()
