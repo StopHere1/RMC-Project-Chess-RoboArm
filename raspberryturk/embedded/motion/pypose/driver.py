@@ -63,6 +63,7 @@ class Driver:
         """ Set the value of registers. Should be called as such:
         ax12.setReg(1,1,(0x01,0x05)) """
         self.execute(index, AX_WRITE_DATA, [regstart] + values)  # AX_WRITE_DATA 来自 ax12.py regstart 是来自
+        # if index=2
         return self.error
 
     def getPacket(self, mode, id=-1, leng=-1, error=-1, params=None):
