@@ -28,7 +28,7 @@ class Gripper(object):
     def calibrate(self):    # reset to the rest height
         self.move(RESTING_HEIGHT)
 
-    def move(self, z):  # Gripper move along Z axis，We do not have this DOF
+    def move(self, z):  # Gripper move along Z axis，We do not have this DOF 末端舵机（我们pro没有）
         z = max(0.0, min(z, 100.0))
         dc = (z * 0.067) + 4.0
         p = GPIO.PWM(servo_pin, 50.0)
@@ -46,9 +46,17 @@ class Gripper(object):
         output = GPIO.HIGH if on else GPIO.LOW
         GPIO.output(electromagnet_pin, output)
 
+    def pickup_new(self):
+        self.electromagnet(True)
+        sleep(0.2)
+
+    def dropoff_new(self):
+        self.electromagnet(False)
+        sleep(0.4)
+
     def pickup(self, piece_type):
         piece_height = PIECE_HEIGHTS[piece_type]
-        self.move(piece_height)
+        self.move(piece_height)  # 不用移动，根据高度需建立逆运动学
         sleep(0.4)
         self.electromagnet(True)
         sleep(0.2)

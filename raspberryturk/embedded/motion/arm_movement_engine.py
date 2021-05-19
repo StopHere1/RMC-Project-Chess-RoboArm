@@ -4,6 +4,21 @@ import pickle
 import logging
 from raspberryturk import RaspberryTurkError, opt_path, cache_path
 from sklearn.neighbors import KDTree
+import chess
+
+length_default_z = 20
+
+PIECE_HEIGHTS = {  # changed according to the chess height (mm)
+    chess.KING: 66,
+    chess.QUEEN: 56,
+    chess.ROOK: 37,
+    chess.BISHOP: 48,
+    chess.KNIGHT: 43,
+    chess.PAWN: 30,
+}
+
+MAX_PIECE_HEIGHT = max(PIECE_HEIGHTS.values())
+RESTING_HEIGHT = MAX_PIECE_HEIGHT + 15   # set rest size considering the length of metal rod ?
 
 
 def _load_tree(logger):
@@ -47,8 +62,17 @@ class ArmMovementEngine(object):
         logger = logging.getLogger(__name__)
         self._tree = _load_tree(logger)
 
-    def convert_point(self, pt):
-        pt = np.array(pt).reshape(-1, 2)
+    def convert_point(self, pt):  # 在二维坐标系中，将（x,y）转化为俩个关节的角度
+        pt = np.array(pt).reshape(-1, 2)  # reshape
+        index = self._tree.query(pt, return_distance=False).ravel()[0]
+        calibrated_offset = 105
+        return np.array([index / 1024 + calibrated_offset, index % 1024])
+
+    def convert_point_new(self, pt, piece_type):  # # 将（x,y）+ piece_type 转化为关节的角度
+        pt = np.array(pt).reshape(-1, 2)  # reshape
+        piece_height = PIECE_HEIGHTS[piece_type]
+        point_coordinate = [pt(0), pt(1), piece_height+length_default_z]  # 利用改三维坐标求就逆运动学
+
         index = self._tree.query(pt, return_distance=False).ravel()[0]
         calibrated_offset = 105
         return np.array([index / 1024 + calibrated_offset, index % 1024])

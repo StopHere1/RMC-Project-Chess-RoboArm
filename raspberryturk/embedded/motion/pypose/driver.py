@@ -152,3 +152,12 @@ class Driver:
                 self.ser.write(chr(value))
         self.ser.write(chr(checksum))
         # no return info...
+
+def main():
+    driver= Driver(port='COM3')
+    driver.setReg(12, P_GOAL_POSITION_L, [512 % 256, 512 >> 8])
+
+
+
+if __name__ == '__main__':
+    main()
