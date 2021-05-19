@@ -13,7 +13,7 @@ def _load_tree(logger):  # 寻找Tree的代码
     try:
         with open(cached_tree_path, 'rb') as f:
             logger.info("Attemptimg to load kd-tree from cache...")
-            tree = pickle.load(f)   # 在缓存文件当中找对应的KDTree
+            tree = pickle.load(f)  # 在缓存文件当中找对应的KDTree
             logger.info("Successfully loaded kd-tree from cache.")
     except (OSError, IOError):
         logger.info("Failed to load kd-tree from {}".format(cached_tree_path))
@@ -51,5 +51,5 @@ class ArmMovementEngine(object):
         pt = np.array(pt).reshape(-1, 2)  # 把数据转换成两列的形式
         index = self._tree.query(pt, return_distance=False).ravel()[0]
         # query 返回与传入point距离最近节点的数组i  ravel（）将数组将为一维数组， 取第0个值
-        calibrated_offset = 105  # 不知道哪里来的校准值
+        calibrated_offset = 105  # 应该是初始位姿
         return np.array([index / 1024 + calibrated_offset, index % 1024])
