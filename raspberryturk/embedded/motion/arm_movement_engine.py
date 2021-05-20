@@ -70,7 +70,7 @@ class ArmMovementEngine(object):
 
     def convert_point_new(self, pt, piece_type):  # # 将（x,y）+ piece_type 转化为关节的角度
         pt = np.array(pt).reshape(-1, 2)  # reshape
-        piece_height = PIECE_HEIGHTS[piece_type]
+        piece_height = PIECE_HEIGHTS[piece_type] # renew
         point_coordinate = [pt(0), pt(1), piece_height+length_default_z]  # 利用改三维坐标求就逆运动学
 
         index = self._tree.query(pt, return_distance=False).ravel()[0]
